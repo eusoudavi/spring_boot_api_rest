@@ -6,8 +6,11 @@ import br.com.alura.forum.modelo.Topico;
 import br.com.alura.forum.repository.CursoRepository;
 import br.com.alura.forum.repository.TopicosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -37,10 +40,16 @@ public class TopicosController {
     }
 
     @PostMapping
-    public void cadastrar(@RequestBody TopicoForm form){
+    public ResponseEntity<TopicoDto> cadastrar(@RequestBody TopicoForm form, UriComponentsBuilder uriBuilder){
         Topico topico = form.converter(cursoRepository);
         topicosRepository.save(topico);
 
+        URI uri = uriBuilder.path("topicos/{id}").buildAndExpand(topico.getId()).toUri();
+        return ResponseEntity.created(uri).body(new TopicoDto(topico));
+//        QUANDO CRIAMOS UM POST E TEMOS A RESPOSTA, COMO BOA PRATICA, TEMOS QUE DEVOLVER AO CLIENTE A RESPOSTA 201
+//        ESSA RESPOSTA INDICA QUE O PROCESSO CRIOU UM NOVO OBJETO NO SISTEMA (HTTP - 201)
+//        PARA ISSO, DEVEMOS RESPONDER AO CLIENTE A URI DESSE OBJETO E COLOCAR NO CORPO DA RESPOSTA O OBJETO CRIADO
+//        uriBuilder -> OBJETO DO PRÓPRIO SPRING PARA CRIAÇÃO DE ENDEREÇOS URI
     }
 
 }
