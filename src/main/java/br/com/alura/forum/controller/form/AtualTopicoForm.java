@@ -3,9 +3,11 @@ package br.com.alura.forum.controller.form;
 import br.com.alura.forum.modelo.Topico;
 import br.com.alura.forum.repository.TopicosRepository;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.http.ResponseEntity;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 public class AtualTopicoForm {
 
@@ -32,9 +34,12 @@ public class AtualTopicoForm {
     }
 
     public Topico atualizar(Long id, TopicosRepository topicosRepository) {
-        Topico topico = topicosRepository.getReferenceById(id);
-        topico.setTitulo(this.titulo);
-        topico.setMensagem(this.mensagem);
-        return topico;
+        Optional<Topico> topico = topicosRepository.findById(id);
+        if (topico.isPresent()){
+            topico.get().setTitulo(this.titulo);
+            topico.get().setMensagem(this.mensagem);
+            return topico.get();
+        }
+        return null;
     }
 }
