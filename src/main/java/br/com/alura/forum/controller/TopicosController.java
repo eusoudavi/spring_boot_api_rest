@@ -50,6 +50,7 @@ public class TopicosController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<TopicoDto> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
         Topico topico = form.converter(cursoRepository);
         topicosRepository.save(topico);
@@ -58,13 +59,18 @@ public class TopicosController {
         return ResponseEntity.created(uri).body(new TopicoDto(topico));
     }
 
-    //    @PatchMapping     A ANOTAÇÃO DO TIPO PATCH NORMALMENTE SERVE PARA PEQUENAS ATUALIZAÇÕES
-    @PutMapping("/{id}")     // ENQUANTO QUE A ATUALIZAÇÃO DO TIPO PUT NORMALMENTE SERVE PARA SOBRESCREVER TODO O TÓPICO
-    @Transactional              // SEM ESSA ANOTAÇÃO, O SPRING NÃO COMMITA AS ATUALIZAÇÕES NO BANCO DE DADOS
+    @PutMapping("/{id}")
+    @Transactional
     public ResponseEntity<TopicoDto> atualizar(@PathVariable Long id, @RequestBody @Valid AtualTopicoForm form) {
         Topico topico = form.atualizar(id, topicosRepository);
-//        QUANDO O MÉTODO ACIMA TERMINAR DE EXECUTAR, O SPRING DATA JÁ VAI ATUALIZAR O BANCO DE DADOS SEM A NECESSIDADE DE MANDAR O SISTEMA FAZER O UPDATE
         return ResponseEntity.ok(new TopicoDto(topico));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> deletar(@PathVariable Long id){
+        topicosRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
 }
