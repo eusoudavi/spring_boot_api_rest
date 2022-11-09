@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/topicos")
@@ -44,9 +45,12 @@ public class TopicosController {
     }
 
     @GetMapping("/{id}")
-    public DetalhesTopicoDto detalhar(@PathVariable Long id) {
-        Topico topico = topicosRepository.getReferenceById(id);
-        return new DetalhesTopicoDto(topico);
+    public ResponseEntity<DetalhesTopicoDto> detalhar(@PathVariable Long id) {
+        Optional<Topico> topico = topicosRepository.findById(id);
+        if (topico.isPresent()){
+            return ResponseEntity.ok(new DetalhesTopicoDto(topico.get()));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping
