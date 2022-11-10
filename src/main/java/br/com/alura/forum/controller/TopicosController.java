@@ -8,6 +8,7 @@ import br.com.alura.forum.modelo.Topico;
 import br.com.alura.forum.repository.CursoRepository;
 import br.com.alura.forum.repository.TopicosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,10 +35,9 @@ public class TopicosController {
     private CursoRepository cursoRepository;
 
     @GetMapping
+    @Cacheable(value = "listaDeTopicos")    // VALUE É A ID ÚNICA DO CACH
     public Page<TopicoDto> listar(@RequestParam(required = false) String nomeCurso, String titulo,
                                   @PageableDefault(sort = "id", direction = Sort.Direction.DESC, page = 0, size = 10) Pageable paginacao) {
-//        ESSE PROCESSO DE PAGINAÇÃO NÃO PRECISA RECEBER A REQUEST NA URL -> JÁ POSSUI UMA PAGINAÇÃO DEFAULT
-//        Pageable paginacao = PageRequest.of(pagina, quantidade, Sort.Direction.ASC, ordenacao);
 
         if (nomeCurso != null && titulo == null) {
             System.out.println(nomeCurso);
