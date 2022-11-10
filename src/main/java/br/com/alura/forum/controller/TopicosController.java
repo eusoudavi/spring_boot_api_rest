@@ -8,6 +8,9 @@ import br.com.alura.forum.modelo.Topico;
 import br.com.alura.forum.repository.CursoRepository;
 import br.com.alura.forum.repository.TopicosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -29,17 +32,23 @@ public class TopicosController {
     private CursoRepository cursoRepository;
 
     @GetMapping
-    public List<TopicoDto> listar(String nomeCurso, String titulo) {
+    public Page<TopicoDto> listar(@RequestParam(required = false) String nomeCurso,
+                                  String titulo, @RequestParam(required = true) int pagina,
+                                  @RequestParam(required = true) int quantidade) {
+//        @RequestParam - AO CONTRÁRIO DO @RequestBody, ESSE PARÂMETRO AJUDA O SPRING A SABER QUE O PARÂMETRO VEM NA URL
+
+        Pageable paginacao = PageRequest.of(pagina, quantidade);
+
         if (nomeCurso != null && titulo == null) {
             System.out.println(nomeCurso);
-            List<Topico> topicos = topicosRepository.findByCursoNome(nomeCurso);
+            Page<Topico> topicos = topicosRepository.findByCursoNome(nomeCurso, paginacao);
             return TopicoDto.converter(topicos);
         } else if (nomeCurso == null && titulo != null) {
             System.out.println(titulo);
-            List<Topico> topicos = topicosRepository.findByTitulo(titulo);
+            Page<Topico> topicos = topicosRepository.findByTitulo(titulo, paginacao);
             return TopicoDto.converter(topicos);
         } else {
-            List<Topico> topicos = topicosRepository.findAll();
+            Page<Topico> topicos = topicosRepository.findAll(paginacao);
             return TopicoDto.converter(topicos);
         }
     }
@@ -47,7 +56,7 @@ public class TopicosController {
     @GetMapping("/{id}")
     public ResponseEntity<DetalhesTopicoDto> detalhar(@PathVariable Long id) {
         Optional<Topico> topico = topicosRepository.findById(id);
-        if (topico.isPresent()){
+        if (topico.isPresent()) {
             return ResponseEntity.ok(new DetalhesTopicoDto(topico.get()));
         }
         return ResponseEntity.notFound().build();
@@ -75,7 +84,7 @@ public class TopicosController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> deletar(@PathVariable Long id){
+    public ResponseEntity<?> deletar(@PathVariable Long id) {
         Optional<Topico> topico = topicosRepository.findById(id);
         if (topico.isPresent()) {
             topicosRepository.deleteById(id);
