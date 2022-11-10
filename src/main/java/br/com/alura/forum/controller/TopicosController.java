@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -32,12 +33,12 @@ public class TopicosController {
     private CursoRepository cursoRepository;
 
     @GetMapping
-    public Page<TopicoDto> listar(@RequestParam(required = false) String nomeCurso,
-                                  String titulo, @RequestParam(required = true) int pagina,
-                                  @RequestParam(required = true) int quantidade) {
-//        @RequestParam - AO CONTRÁRIO DO @RequestBody, ESSE PARÂMETRO AJUDA O SPRING A SABER QUE O PARÂMETRO VEM NA URL
+    public Page<TopicoDto> listar(@RequestParam(required = false) String nomeCurso, String titulo,
+                                  @RequestParam int pagina,
+                                  @RequestParam int quantidade,
+                                  @RequestParam String ordenacao) {
 
-        Pageable paginacao = PageRequest.of(pagina, quantidade);
+        Pageable paginacao = PageRequest.of(pagina, quantidade, Sort.Direction.ASC, ordenacao);
 
         if (nomeCurso != null && titulo == null) {
             System.out.println(nomeCurso);
