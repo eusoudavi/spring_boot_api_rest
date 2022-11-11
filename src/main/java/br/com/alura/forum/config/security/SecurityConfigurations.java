@@ -1,5 +1,6 @@
 package br.com.alura.forum.config.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -11,11 +12,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 @Configuration
 public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
-//    AO IMPLEMENTAR ESSA CLASSE, TUDO ESTÁ BLOQUEADO ATÉ QUE EU VENHA AQUI LIBERAR O ACESSO
+
+    @Autowired
+    private AutenticacaoService autenticacoaService;
 
 //    CONFIGURAR A PARTE DE AUTENTICAÇÃO
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(autenticacoaService);
+//        ACIMA PASSAMOS A SERVICE QUE VAI PASSAR O USUÁRIO CADASTRADOS
     }
 
 //    CONFIGURAR A PARTE DE AUTORIZAÇÃO
@@ -24,9 +29,7 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/topicos").permitAll()
                 .antMatchers(HttpMethod.GET, "/topicos/*").permitAll()
-//      ACIMA, ESTAMOS LIBERANDO ACESSO AS REQUISIÇÕES DO TIPO GET AOS ENDEREÇOS LISTADOS
                 .anyRequest().authenticated()
-//      PARA AS DEMAIS REQUISIÇÕES, PRECISA DE AUTENTICAÇÃO
                 .and().formLogin();
     }
 
