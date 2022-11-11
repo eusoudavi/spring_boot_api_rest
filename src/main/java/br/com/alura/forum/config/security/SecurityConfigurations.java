@@ -23,8 +23,11 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/topicos").permitAll()
-                .antMatchers(HttpMethod.GET, "/topicos/*").permitAll();
+                .antMatchers(HttpMethod.GET, "/topicos/*").permitAll()
 //      ACIMA, ESTAMOS LIBERANDO ACESSO AS REQUISIÇÕES DO TIPO GET AOS ENDEREÇOS LISTADOS
+                .anyRequest().authenticated()
+//      PARA AS DEMAIS REQUISIÇÕES, PRECISA DE AUTENTICAÇÃO
+                .and().formLogin();
     }
 
 //    CONFIGURAR RECURSOS ESTÁTICOS - JS, CSS, IMG...
