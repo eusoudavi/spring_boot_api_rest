@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @EnableWebSecurity
 @Configuration
@@ -19,8 +20,9 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 //    CONFIGURAR A PARTE DE AUTENTICAÇÃO
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(autenticacoaService);
+        auth.userDetailsService(autenticacoaService).passwordEncoder(new BCryptPasswordEncoder());
 //        ACIMA PASSAMOS A SERVICE QUE VAI PASSAR O USUÁRIO CADASTRADOS
+//        ACIMA TAMBÉM PASSAMOS O FORMATO QUE A SENHA ESTÁ ENCRIPTADA
     }
 
 //    CONFIGURAR A PARTE DE AUTORIZAÇÃO
@@ -36,6 +38,11 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 //    CONFIGURAR RECURSOS ESTÁTICOS - JS, CSS, IMG...
     @Override
     public void configure(WebSecurity web) throws Exception {
-        super.configure(web);
+
     }
+
+//    CÓDIGO APENAS PARA GERAR O HASH DA SENHA QUE FICARÁ CADASTRADA NO BANCO DE DADOS
+//    public static void main(String[] args) {
+//        System.out.println(new BCryptPasswordEncoder().encode("123456"));
+//    }
 }
