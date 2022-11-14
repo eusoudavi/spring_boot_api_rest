@@ -1,5 +1,6 @@
 package br.com.alura.forum.config.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -10,20 +11,27 @@ import java.io.IOException;
 
 public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 
+    //    @Autowired        NÃO PODEMOS FAZER INJEÇÃO NO FILTRO
+    private TokenService tokenService;
+
+    public AutenticacaoViaTokenFilter(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String token = recuperarToken(request);
-        System.out.println(token);
-//        Jwts
+        Boolean valido = tokenService.isTokenValido(token);
+        System.out.println(valido);
 
         filterChain.doFilter(request, response);
     }
 
     private String recuperarToken(HttpServletRequest request) {
-        String token = request.getParameter("Authorization");
+        String token = request.getHeader("Authorization");
 
-        if (token == null || token.isEmpty() || !token.startsWith("Bearer ")){
+        if (token == null || token.isEmpty() || !token.startsWith("Bearer ")) {
             return null;
         } else {
             return token.substring(7, token.length());
