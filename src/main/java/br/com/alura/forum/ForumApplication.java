@@ -7,7 +7,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 @SpringBootApplication
 @EnableSpringDataWebSupport
-@EnableCaching	// PARA HABILITAR O RECURSO DE CACH NA APLICAÇÃO
+@EnableCaching
 public class ForumApplication {
 
 	public static void main(String[] args) {
