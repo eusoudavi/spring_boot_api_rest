@@ -1,6 +1,10 @@
 package br.com.alura.forum.config.security;
 
+import br.com.alura.forum.modelo.Usuario;
+import br.com.alura.forum.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -11,11 +15,12 @@ import java.io.IOException;
 
 public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 
-    //    @Autowired        NÃO PODEMOS FAZER INJEÇÃO NO FILTRO
     private TokenService tokenService;
+    private UsuarioRepository usuarioRepository;
 
-    public AutenticacaoViaTokenFilter(TokenService tokenService) {
+    public AutenticacaoViaTokenFilter(TokenService tokenService, UsuarioRepository usuarioRepository) {
         this.tokenService = tokenService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
@@ -23,9 +28,17 @@ public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 
         String token = recuperarToken(request);
         Boolean valido = tokenService.isTokenValido(token);
-        System.out.println(valido);
-
+        if (valido) {
+            autenticarCliente(token);
+        }
         filterChain.doFilter(request, response);
+    }
+
+    private void autenticarCliente(String token) {
+        Long idUsuario = tokenService.getIdUsuario(token);      // DENTRO DO TOKEN HÁ O ID DO USUÁRIO QUE GEROU ESSE TOKEN
+        Usuario usuario = usuarioRepository.findById(idUsuario).get();
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     private String recuperarToken(HttpServletRequest request) {

@@ -22,10 +22,10 @@ public class Usuario implements UserDetails {
 	private String email;
 	private String senha;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "usuario_perfis",
 			joinColumns = @JoinColumn(name = "usuario_id"),
-			inverseJoinColumns = @JoinColumn(name = "perfises_id"))
+			inverseJoinColumns = @JoinColumn(name = "perfis_id"))
 	private List<Perfis> perfis = new ArrayList<>();
 
 	public List<Perfis> getPerfis() {
