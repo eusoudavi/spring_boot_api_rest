@@ -47,7 +47,9 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/topicos").permitAll()
                 .antMatchers(HttpMethod.GET, "/topicos/*").permitAll()
                 .antMatchers(HttpMethod.POST, "/auth").permitAll()
-                .antMatchers(HttpMethod.GET, "/actuator/**").permitAll() // LIBERADO PARA QUE O SPRING-ADMIN POSSA MONITORAR
+                .antMatchers(HttpMethod.GET, "/actuator/**").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/topicos/*")
+                    .hasRole("MODERADOR") // SÓ PERMITE EXCLUSÃO PARA QUEM TEM PERFIL DE MODERADOR -> PRECISAMOS COLOCAR NA TABLEA COMO ROLE_MODERADOR
                 .anyRequest().authenticated()
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
