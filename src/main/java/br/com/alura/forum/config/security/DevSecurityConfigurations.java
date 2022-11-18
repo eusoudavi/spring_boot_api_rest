@@ -18,14 +18,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @Configuration
-@Profile("prod")
-public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
+@Profile("dev")
+public class DevSecurityConfigurations extends WebSecurityConfigurerAdapter {
 
-    @Override
-    @Bean
-    protected AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
-    }
 
     @Autowired
     private AutenticacaoService autenticacoaService;
@@ -36,34 +31,12 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-//    CONFIGURAR A PARTE DE AUTENTICAÇÃO
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(autenticacoaService).passwordEncoder(new BCryptPasswordEncoder());
-    }
 
 //    CONFIGURAR A PARTE DE AUTORIZAÇÃO
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/topicos").permitAll()
-                .antMatchers(HttpMethod.GET, "/topicos/*").permitAll()
-                .antMatchers(HttpMethod.POST, "/auth").permitAll()
-                .antMatchers(HttpMethod.GET, "/actuator/**").permitAll() // LIBERADO PARA QUE O SPRING-ADMIN POSSA MONITORAR
-                .anyRequest().authenticated()
-                .and().csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().addFilterBefore(new AutenticacaoViaTokenFilter(tokenService, usuarioRepository), UsernamePasswordAuthenticationFilter.class);
+                .antMatchers("/**").permitAll()
+                .and().csrf().disable();
     }
-
-//    CONFIGURAR RECURSOS ESTÁTICOS - JS, CSS, IMG...
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-
-    }
-
-//    CÓDIGO APENAS PARA GERAR O HASH DA SENHA QUE FICARÁ CADASTRADA NO BANCO DE DADOS
-//    public static void main(String[] args) {
-//        System.out.println(new BCryptPasswordEncoder().encode("123456"));
-//    }
 }
